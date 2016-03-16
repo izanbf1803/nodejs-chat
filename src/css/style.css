@@ -1,0 +1,353 @@
+@media screen and (min-width: 0px) and (max-width: 1050px) {
+    div#emoji{
+        visibility: hidden !important;
+    }
+}
+*{
+    cursor: url("lol.cur"), auto; 
+}
+html{
+    -webkit-user-select: none;
+    user-select: none;
+    min-height: 100%;
+}
+input,div,p{
+    font-family: "Comic Sans MS", cursive, sans-serif;
+}
+input{
+    outline-color: rgba(50,50,50,1);
+}
+body{
+    overflow: hidden;
+    background-color: rgba(100,100,100,1);
+    display: none; 
+    transition: top 1s ease-in-out; 
+}
+
+/*MODALS*/
+    .modalDialog {
+        position: fixed;
+        font-family: Arial, Helvetica, sans-serif;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: rgba(0,0,0,0.8);
+        z-index: 99999;
+        opacity:0;
+        transition: opacity 0.4s ease-in;
+        pointer-events: none;
+    }
+    div#help{
+        position: relative;
+        padding-bottom: 80px;
+        text-align: center;
+        width: 600px;
+        margin: 10% auto;
+        border: none;
+        border-radius: 15px;
+        font-size: 1vw;
+        color: rgba(0,0,0,0.5);
+        background: linear-gradient(
+            to bottom,
+            #fff, #999);
+    } 
+    /*REGISTRO*/
+    div,p,legend,fieldset{font-family: "Comic Sans MS", cursive, sans-serif;}
+    div#register{
+        margin-top: 30px;
+    }
+    fieldset#reg{
+        position: relative;
+        padding-bottom: 80px;
+        width: 500px;
+        margin: 10% auto;
+        border: none;
+        border-radius: 15px;
+        font-size: 20pt;
+        color: rgba(0,0,0,0.5);
+        background: linear-gradient(
+            to bottom,
+            #fff, #999);
+    }
+    fieldset#reg>ledend>span{
+        transition-duration: 0.3s;
+    }
+    span{text-shadow: 2px 2px rgba(0,0,0,0.1);}
+    span:hover{text-shadow: 2px 2px rgba(0,0,0,0.2);}
+    input, input[placeholder]{
+        outline-color: rgba(50,50,50,1);
+        background-color: rgba(230,230,230,1);
+        color: rgba(0,0,0,1);
+        margin: 3px auto;
+    }
+    input,fieldset{transition-duration: 0.3s;}
+    input:hover,button:hover,fieldset:hover{box-shadow: 0px 0px 5px black;}
+    label#label-save{
+        opacity:0.5;
+        position: relative;
+        width: 200px;
+        left: calc(50% - 147px);
+        top: 20px;
+        color: rgba(0,0,0);
+        transition: opacity 0.3s ease-in-out;
+    }
+    /*****_REGISTRO_*****/
+    .close {
+        background: #606061;
+        color: #FFFFFF;
+        line-height: 25px;
+        position: absolute;
+        text-align: center;
+        width: 24px;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 12px;
+        font-size: 10pt;
+        box-shadow: 1px 1px 3px #000;
+        transition: background 0.2s;
+    }
+    .close:hover { background: #00d9ff; }
+    a#close1{
+        top: -7px;
+        right: -7px;
+    }   
+    a#close2{
+        top: -7px;
+        right: -7px;
+    } 
+/******_MODALS_*******/
+
+.changeColor{
+    animation: changeCol 2s 1;
+    animation-fill-mode: forwards;
+}
+@keyframes changeCol{
+    100%{background-color: rgba(255,255,255,1);}
+}
+img{
+    max-width: 535px;
+    max-height: 535px;
+}
+div#nickWrap input{
+    background-color: rgba(220,220,220,1);
+    outline-color: rgba(250,250,250,1);
+}
+#users{
+    position: absolute;
+    height: auto;
+    width: 15%;
+    left: 2.5%;
+    top: 5%;
+    text-align: center;
+    border: 1px blue solid;
+    border-radius: 20px;
+    border-color: rgba(0,0,100,0.5);
+    font-size: 2vh;
+}
+#chat{
+    font-size: 2vh;
+    height: 90%;
+    margin-left: 5px;
+    margin-bottom: 20px;
+    word-wrap: break-word;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    direction: ltr;
+    text-shadow: 2px 2px rgba(0,0,0,0.1);
+}
+#emoji{
+    position: absolute;
+    top: -1%;
+    left: 85%;
+    float: none;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    direction: ltr;
+    display: none;
+    height: 101%;
+    width: 18vh;
+    text-align: center;
+    border: 1px green solid;
+    border-radius: 1px;
+    border-top-color: rgba(0,50,0,0.4);
+    border-left-color: rgba(0,50,0,0.6);
+    border-right-color: rgba(0,50,0,0.6);
+    border-bottom-color: rgba(0,50,0,0.8);
+    font-size: 2vh;
+}
+#chatWrap{
+    left: calc(50% - 20%);
+    position: absolute;
+    width: 40%;
+    height: 60%;
+    border: 1px #000 solid;
+    top: 20%;
+}
+#contentWrap{
+    display: none;
+}
+form#send-message{
+    position: relative;
+    margin-left: 2%;
+    margin-right: 0%;
+    height: 10%;
+    bottom: 5%;
+}
+#message{
+    height: 35%;
+    width: 75%;
+    border-color: rgba(0,0,100,0.5);
+}
+#messageSubmit2{
+    height: 20%;
+    width: 50%;
+    font-size: 1vw;
+    margin-left: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+    height: 10%;
+    bottom: 2%;
+}
+#messageSubmit{
+    position: absolute;
+    top: -5px;
+    height: 2vw;
+    width: 4vw;
+    font-size: 1vw;
+    margin-left: 10px;
+    margin-left: 5%;
+    margin-right: 5%;
+    height: 10%;
+    bottom: 2%;
+}
+#message{
+    height: 35%;
+    width: 85%;
+    border-color: rgba(0,0,100,0.5);
+}
+#messageSubmit{
+    height: 50%;
+    width: 10%;
+    font-size: 15px;
+    margin-left: 2.5%;
+    border-color: rgba(0,0,100,0.5);
+    background-color: rgba(0,0,100,0.15);
+}
+.registerSubmit{
+    width: 15% !important;
+    margin-top: 5%;
+}
+#nickname{ 
+    background-color: white;
+}
+#password{
+    background-color: white;
+    margin-top: 10px;
+}
+#submitNick{
+    position: absolute;
+    top: 70px;
+    left: 330px;
+}
+#registrarLink{
+    position: relative;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    color: rgba(200,200,200,1);
+    text-decoration: none;
+    font-size: 1vw;
+}
+.link{
+    transition: color 0.75s;
+}
+.link:after{
+    margin-left: 50%;
+    content: "";
+    position: absolute;
+    width: 0%;
+    height: 1px;
+    left: 0px;
+    bottom: 0px;
+    background-color: rgba(200,200,200,1);
+    transition: width 0.5s ease-in-out, background-color 0.5s ease-in-out, margin 0.5s ease-in-out;
+}
+.link:hover{
+    color: rgba(255,255,255,1) !important;
+}
+.link:hover:after{
+    margin-left: 0%;
+    width: 100%;
+    background-color: rgba(255,255,255,1);
+}
+.emoji{
+    transition: -webkit-filter 0.3s ease-in-out, -moz-filter 0.3s ease-in-out, filter 0.3s ease-in-out;
+}
+.emoji:hover{
+    -webkit-filter: brightness(0.5);
+    -moz-filter: brightness(0.5);
+    filter: brightness(0.5);
+}   
+#nickWrap{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-top: -100px;
+    margin-left: -200px;
+    height: 200px;
+    width: 400px;
+    transition-duration: 0.4s;
+}
+#nickWrap.volt{
+    top: -50%;
+}
+#ipButton{
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    margin-top: 55px;
+    margin-left: -200px;
+    height: 25px;
+    width: 390px;
+}
+#passHelp{
+    position: relative;
+    width: 200px;
+    left: calc(50% - 100px);
+    bottom: -30px;
+    display: none;
+    color: rgba(200,200,200,1);
+    text-decoration: none;
+}
+#footer{
+    width: 200px;
+    height: 5px;
+    margin-top: 10px;
+    text-align: center;
+    position: absolute;
+    font-family: "Comic Sans MS", cursive, sans-serif;
+    color: rgba(0,0,0,0.1);
+    top: calc(95% - 10px);
+    left: calc(50% - 100px);
+}
+@media screen and (max-height: 360px) {
+    #footer {
+        visibility: hidden !important;
+    }
+}
+input, div#emoji, div#chatWrap, div#users, button{
+    transition-duration: 0.3s;
+}
+input:hover,button:hover,
+div#users:hover,div#emoji:hover,div#chatWrap:hover{
+    box-shadow: 0px 0px 5px black;
+}
+
+@keyframes mov{
+  0% {
+    opacity: 0.2;
+  }
+  100% {
+    opacity: 1;
+  }
+}

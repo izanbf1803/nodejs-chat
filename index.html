@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="A simple and good chat made by a young programmer.">
+<meta name="keywords" content="chat, izan, izanbf, izanbf1803, socket, programming, talk">
+<html lang="es">
+<head>
+    <title>Chat Izan</title>
+    <script>
+        var OS="unknown OS";
+        if (navigator.appVersion.indexOf("Win")!=-1) OS="Windows";
+        if (navigator.appVersion.indexOf("Mac")!=-1) OS="MacOS";
+        if (navigator.appVersion.indexOf("X11")!=-1) OS="UNIX";
+        if (navigator.appVersion.indexOf("Linux")!=-1) OS="Linux";
+    </script>
+    <link href="css/favicon.ico" rel="icon" type="image/x-icon" />
+    <link href="css/style.css" rel="stylesheet" type="text/css" />
+    <a href="html/help.html" id="helpEmoji"></a>
+    <script src="js/jquery-1.11.3.min.js"></script>
+    <script src="js/socket.io.js"></script>
+    <!--Creado por Izan Beltran-->
+</head>
+<body oncontextmenu="return false">
+    <!--MODALS-->
+    <div id="registrarse" class="modalDialog">
+        <fieldset id="reg">
+            <ledend><span>Registro</span></legend>
+            <div id="register" align="center">
+                <a id="close1" title="Close" class="close">X</a>
+                <form id="registerForm">
+                    <input id="nick" placeholder="Elige tu nombre" size="35" maxlength="35"/><br/>
+                    <input id="email" placeholder="Introduce tu correo" size="35" maxlength="100"/><br/><br/>
+                    <input id="pass" placeholder="Elige tu contraseña" size="35" type="password" maxlength="20"/><br/>
+                    <input id="pass2" placeholder="Repite tu contraseña" size="35" type="password" maxlength="20"/><br/>
+                    <input type="submit" id="messageSubmit2" class="registerSubmit"/>
+                </form>
+            </div>
+        </fieldset>
+    </div>
+    <div id="mHelp" class="modalDialog">
+        <div id="help">
+            <a id="close2" title="Close" class="close">X</a>
+            <div id="helpContent">
+                <br/><br/><p><font style="font-size: 1.25vw;">Puedes hacerlo clicando en el emoticono, así de simple!</font></p><br/>
+                <p>Tambien puedes poner: <b>%%(Y el nombe del emoticono)</b>.<br/><u>También es importante dejar un espacio después de ponerlo.</u><br/></br>
+                    Por ejemplo:  &nbsp;&nbsp;&nbsp;<i>"Hola! </i><b>%%risa</b> "<br/><br/>
+                    Resultado:  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>"Hola! </i><img src="/emoji/emoji_risa.gif" width=auto height=auto/>"
+                </p>
+            </div>
+        </div>
+    </div>
+    <!---->
+    <script id="_register">
+        var socket = io.connect();  
+        var $register = $("#registerForm");
+        var $nickBox = $("#nick");
+        var $passBox = $("#pass");
+        var $passBox2 = $("#pass2");
+        var $emailBox = $("#email");
+        var banned = false;
+
+        socket.emit("checkbann");
+
+        socket.on("youarebanned", function(){
+            banned = true;
+        });
+
+        $register.submit(function(e){
+            e.preventDefault();
+            socket.emit("checkbann");
+            if (!banned){
+                $nickBox.val($nickBox.val().replace(/\s\s/g, '').replace(/</g, "").replace(/>/g, ""));
+                if ($emailBox.val().substring(0, 1) != "@" && $emailBox.val().indexOf("@") != -1 && $emailBox.val().substring($emailBox.val().length-1, $emailBox.val().length) != "@"){
+                    if ($nickBox.val().length > 3 && $passBox.val().length > 3 && $nickBox.val().indexOf("ADMIN") == -1 && $emailBox.val()){
+                        if ($passBox.val() == $passBox2.val()){
+                            socket.emit("register", {nick: $nickBox.val(), pass: $passBox.val(), email: $emailBox.val()}, function(data){
+                                if(data == true){
+                                    alert("Revisa tu correo para completar el registro");
+                                    //window.location.href = "javascript:history.go(-1)"; //#Ir una página atrás
+                                }else{
+                                    alert(data);
+                                }
+                            });
+                        }else{
+                            alert("Las contraseñas no son iguales");
+                        }
+                        $passBox.val("");
+                        $passBox2.val("");
+                        $nickBox.val("");
+                        $emailBox.val("");
+                    }else if ($nickBox.val().indexOf("ADMIN") != -1){
+                        alert("Tu no eres un admin");
+                    }else{
+                        alert("Mínimo 4 carácteres");
+                    }
+                }else{
+                    alert("Correo inválido");
+                }
+            }else{
+                alert("Estás baneado");
+            }
+        });
+    </script>
+    </div>
+    <a id="registrarLink" class="link" title="Pulsa para registrarte">Registarse</a>
+    <div id="nickWrap">
+        <p style="color:rgba(250,250,250,1); font-size: 1vw;">Introduce tus datos:</p>
+        <p id="nickError"></p>
+        <form id="setNick">
+            <input size="35" id="nickname" maxlength="35" placeholder="Tu usuario"  title="Porfavor introduce tu nick"></input>
+            <input type="password" size="35" id="password" maxlength="20" placeholder="Tu contraseña"  title="Porfavor introduce tu contraseña"></input>
+            <input type="submit" id="submitNick" value="Aceptar" class="button"></input><br/>
+            <label id="label-save"><input type="checkbox" id="savePassCheck" style="left: 10px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Recordar mi contraseña</input></label>
+            <a id="passHelp" class="link" title="Recuperación de datos"><br/><br/>He olvidado mis datos</a>
+        </form>
+        <form id="ipForm" title="Pulsa para ver tu IP">
+            <button id="ipButton" class="button">Cual es mi IP?</button>
+        </form>
+    </div>
+    <div id="contentWrap">
+        <div id="chatWrap">
+            <div id="chat"></div>
+            <form id="send-message" autocomplete="off">
+                <input size="35" id="message" maxlength="500"></input>
+                <input type="submit" id="messageSubmit" class="button"></input>
+            </form>
+        </div>
+        <div id="users"></div>
+    </div>
+    <div id="emoji">
+        <p>
+            <br/><font color="green"><b>Emoticonos:</b><br/></font>
+            <br/><button type="button" id="emojiHelp" class="button">como se usan?</button><br><br>
+            <img class="emoji" src="emoji/emoji_risa.gif" width=auto heigth=auto/> risa<br>
+            <img class="emoji" src="emoji/emoji_aplauso.gif" width=auto heigth=auto/> aplauso<br>
+            <img class="emoji" src="emoji/emoji_nono.gif" width=auto heigth=auto/> nono<br>
+            <img class="emoji" src="emoji/emoji_nose.gif" width=auto heigth=auto/> nose<br>
+            <img class="emoji" src="emoji/emoji_lol.gif" width=auto heigth=auto/> lol<br>
+            <img class="emoji" src="emoji/emoji_no.gif" width=auto heigth=auto/> no<br>
+            <img class="emoji" src="emoji/emoji_lloro.gif" width=auto heigth=auto/> lloro<br>
+            <img class="emoji" src="emoji/emoji_yeah.gif" width=auto heigth=auto/> yeah<br>
+            <img class="emoji" src="emoji/emoji_burla.gif" width=auto heigth=auto/> burla<br>
+            <img class="emoji" src="emoji/emoji_smoke.gif" width=auto heigth=auto/> smoke<br>
+            <img class="emoji" src="emoji/emoji_guitarra.gif" width=auto heigth=auto/> guitarra<br>
+            <img class="emoji" src="emoji/emoji_rock.gif" width=auto heigth=auto/> rock<br>
+            <img class="emoji" src="emoji/emoji_metal.gif" width=auto heigth=auto/> metal<br>
+            <img class="emoji" src="emoji/emoji_llamada.gif" width=auto heigth=auto/> llamada<br>
+            <img class="emoji" src="emoji/emoji_morreo.gif" width=auto heigth=auto/> morreo<br>
+            <img class="emoji" src="emoji/emoji_pico.gif" width=auto heigth=auto/> pico<br>
+            <img class="emoji" src="emoji/emoji_meparto.gif" width=auto heigth=auto/> meparto<b>
+            <img class="emoji" src="emoji/emoji_gym.gif" width=auto heigth=auto/> gym<br>
+            <img class="emoji" src="emoji/emoji_dj.gif" width=auto heigth=auto/> dj<br>
+            <img class="emoji" src="emoji/emoji_fiestuki.gif" width=auto heigth=auto/> fiestuki<br>
+            <img class="emoji" class="emoji" src="emoji/emoji_ofensivo.gif" width=auto heigth=auto/> ofensivo<br>
+            <img class="emoji" src="emoji/emoji_estreñido.gif" width=auto heigth=auto/> estreñido<br>
+            <img class="emoji" src="emoji/emoji_felicidades.gif" width=auto heigth=auto/> felicidades<br>
+            <br/>
+        </p>
+    </div>
+    <script id="_modals">
+        var $currentModal;
+
+        $("#registrarLink").click(function(){
+            $("#registrarse").css({"opacity":"1","pointer-events":"auto"});
+            $currentModal = $("#registrarse");
+        });
+
+        $(".close").click(function(){
+            $currentModal.css({"opacity":"0","pointer-events":"none"});
+        });
+    </script>
+    <script id="_chat">
+        $(document).ready(function(){
+            var $nickForm = $("#setNick");
+            var $emojiHelpButton = $("#emojiHelp");
+            var $ipButton = $("#ipButton");
+            var $nickError = $("#nickError");
+            var $nickBox = $("#nickname");
+            var $passBox = $("#password");
+            var $users = $("#users");
+            var $messageForm = $("#send-message");
+            var $messageBox = $("#message");
+            var $chat = $("#chat");
+            var $passHelp = $("#passHelp");
+            var ip, nick, focus, connected, banned, kicked;
+
+            $("body").delay(100).fadeIn(1500);
+
+            $nickBox.focus();
+
+            save = getCookie("savePass");
+            $nickBox.val(getCookie("username"));
+            $passBox.val(getCookie("password"));
+
+            if (save == "true"){
+                $("#savePassCheck").prop("checked",true);
+                $("#label-save").css({"opacity":"1"});
+            }
+
+            function focusFunc(obj){obj.focus();}
+
+            $nickForm.submit(function(e){
+                var nickVal = $nickBox.val();
+                var passVal = $passBox.val();
+                $nickError.hide();
+                e.preventDefault();
+                nickVal = (nickVal.replace(/\s\s/g, '').replace(/</g, "").replace(/>/g, ""));
+                if (nickVal[nickVal.length-1] == " "){
+                    nickVal = (nickVal.replace(nickVal[nickVal.length-1], ""));
+                }
+                if (nickVal != ""){
+                    if(nickVal.length > 3 && nickVal.length < 36){
+                        nick = nickVal; pass = passVal;
+                        socket.emit("new user", {nick: nick, pass: pass}, function(data){
+                            if(data){
+                                if (!banned){
+                                    setCookie("username",nick,100);
+                                    if ($('#savePassCheck').prop("checked") == true){
+                                        setCookie("password",pass,100);
+                                        setCookie("savePass","true",100);
+                                    }else{
+                                        setCookie("savePass","false",100);
+                                        delCookie("password");
+                                    }
+                                    document.getElementById("nickWrap").classList.add("volt");
+                                    $nickBox.attr("placeholder", "");
+                                    $passBox.attr("placeholder", "");
+                                    $nickBox.prop("disabled",true);
+                                    $passBox.prop("disabled",true);
+                                    $("#footer").hide();
+                                    $("#registrarLink").hide();
+                                    $("#nickWrap").fadeOut(500);
+                                    $("#contentWrap").delay(700).fadeIn(1000);
+                                    $("#emoji").delay(500).fadeIn(1000);
+                                    $("body").addClass("changeColor");
+                                    clearInterval(focus);
+                                    focus = window.setInterval(focusFunc,50,$("#message"));
+                                }
+                            }else{
+                                $nickError.show();
+                                $nickError.html("Este usuario ya está conectado!");
+                            }
+                        });
+                    }else{
+                        if (nickVal.length < 4) {$nickError.show(); $nickError.html("Mínimo 4 carácteres");}
+                        if (nickVal.length > 35) {$nickError.show(); $nickError.html("Máximo 35 carácteres");}
+                    }
+                }
+                $nickBox.val("");
+                $passBox.val("");
+            });
+
+            $messageForm.submit(function(e){
+                e.preventDefault();
+                if ($messageBox.val().indexOf("script") != -1 || $messageBox.val().indexOf("<") != -1) filter();
+                if($messageBox.val() != ""){
+                    var notFound = false;
+                    if ($messageBox.val().indexOf("<") != -1){
+                        closeHTML();
+                    }
+                    if ($messageBox.val().substring(0, 2) == "#!" && nick.substring(0, 6) == "ADMIN"){
+                        switch ($messageBox.val().substring(2, $messageBox.val().length+1)){
+                            case "clear":
+                                e.preventDefault();
+                                socket.emit("clear");
+                                break;
+                            }
+                            if ($messageBox.val().substring(2, 8) == "bannip"){
+                                var nickToUnbann = $messageBox.val().replace("#!bannip ", "");
+                                socket.emit("bannip", nickToUnbann);
+                            }else if ($messageBox.val().substring(2, 10) == "unbannip"){
+                                var nickToUnbann = $messageBox.val().replace("#!unbannip ", "");
+                                socket.emit("unbannip", nickToUnbann);
+                            }else if ($messageBox.val().substring(2, 10) == "bannuser"){
+                                var nickToBann = $messageBox.val().replace("#!bannuser ", "");
+                                socket.emit("bannuser", nickToBann);
+                            }else if ($messageBox.val().substring(2, 12) == "unbannuser"){
+                                var nickToUnbann = $messageBox.val().replace("#!unbannuser ", "");
+                                socket.emit("unbannuser", nickToUnbann);
+                            }else if ($messageBox.val().substring(2, 6) == "bann"){
+                                var nickToBann = $messageBox.val().replace("#!bann ", "");
+                                socket.emit("bann", nickToBann);
+                            }else if ($messageBox.val().substring(2, 8) == "unbann"){
+                                var nickToUnbann = $messageBox.val().replace("#!unbann ", "");
+                                socket.emit("unbann", nickToUnbann);
+                            }else if ($messageBox.val().substring(2, 6) == "kick"){
+                                var nickToKick = $messageBox.val().replace("#!kick ", "");
+                                socket.emit("kick", nickToKick);
+                            }else if ($messageBox.val().substring(2, 7) == "alert"){
+                                var nickToKick = $messageBox.val().replace("#!alert ", "");
+                                socket.emit("alertTo", nickToKick);
+                            }else if ($messageBox.val().substring(2, 9) == "destroy"){
+                                var nickToKick = $messageBox.val().replace("#!destroy ", "");
+                                socket.emit("destroyTo", nickToKick);
+                            }else if ($messageBox.val().substring(2, 4) == "ip"){
+                                var nickToIP = $messageBox.val().replace("#!ip ", "");
+                                socket.emit("getIP", nickToIP);
+                            }
+                    }else if ($messageBox.val().search("%%") != -1){
+                        while ($messageBox.val().search("%%") != -1){
+                            var start = ($messageBox.val().indexOf("%%")+2);
+                            if ($messageBox.val().indexOf(" ",start) != -1){
+                                var emoji = $messageBox.val().substring(start, $messageBox.val().indexOf(" ",start));
+                            }else{
+                                var emoji = $messageBox.val().substring(start, $messageBox.val().length);
+                            }
+                            var emoticono = "<img src='emoji/emoji_"+emoji+".gif' width=auto heigth=auto id='1'/>";
+                            $messageBox.val($messageBox.val().replace("%%"+emoji,emoticono));
+                        }
+                        e.preventDefault();
+                        socket.emit("send message", $messageBox.val());
+                    }else{
+                        e.preventDefault();
+                        socket.emit("send message", $messageBox.val());
+                    }
+                    $messageBox.val("");
+                }
+            });
+
+            function closeHTML(){
+                var message = $messageBox.val();
+                var countOPEN = message.match(/</g);
+                var countCLOSED = message.match(/>/g);
+                if (countCLOSED != null){
+                    if (countOPEN.length > countCLOSED.length){
+                        var needToClose = countOPEN.length - countCLOSED.length;
+                        for (i=0;i<neddToClose;i++){
+                            message += ">";
+                        }
+                        $messageBox.val(message);
+                    }
+                }else{
+                    for (i=0;i<countOPEN.length;i++){
+                        message += ">";
+                    }
+                    $messageBox.val(message);
+                }
+            }
+
+            function filter(){
+                if (nick.substring(0, 6) != "ADMIN") $messageBox.val($messageBox.val().replace(/<script/g,"&lt;script").replace(/<div/g,"&lt;div").replace(/<iframe/g,"&lt;iframe").replace(/<embed/g,"&lt;embed"));
+            } 
+
+            function getParameterByName(name) {
+                var match = RegExp('[?&]' + name + '=([^&]*)').exec(window.location.search);
+                return match && decodeURIComponent(match[1].replace(/\+/g, ' '));
+            }
+
+            function setCookie(cname, cvalue, exdays) {
+                var d = new Date();
+                d.setTime(d.getTime() + (exdays*24*60*60*1000));
+                var expires = "expires="+d.toUTCString();
+                document.cookie = cname+"="+cvalue+";"+expires;
+            }
+
+            function delCookie(cname){
+                var d = new Date();
+                d.setTime(d.getTime()-1);
+                var expires = "expires="+d.toUTCString();
+                document.cookie = cname+"="+";"+expires;
+            }
+
+            function getCookie(cname) {
+                var name = cname + "=";
+                var ca = document.cookie.split(';');
+                for(var i=0; i<ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0)==' ') c = c.substring(1);
+                    if (c.indexOf(name) == 0) return c.substring(name.length,c.length);
+                }
+                return "";
+            }
+
+            $("#savePassCheck").click(function(){
+                $currentOpacity = $("#label-save").css("opacity");
+                if ($currentOpacity == 1){
+                    $("#label-save").css({"opacity":"0.5"});
+                }else{
+                    $("#label-save").css({"opacity":"1"});
+                }
+            });
+
+            $emojiHelpButton.click(function(){
+                $("div#mHelp").css({"opacity":"1","pointer-events":"auto"});
+                $currentModal = $("div#mHelp");
+            });
+
+            $("#emoji > p > img").click(function(){
+                sel = $(this).attr("src").replace("emoji/emoji_","").replace(".gif","");
+                $messageBox.val( $messageBox.val()+" %%"+sel );
+            });
+
+            $ipButton.click(function(){
+                alert(ip);
+            });
+
+            $passHelp.click(function(){
+                var Hmail = prompt("Introduce tu correo para recibir tus datos: ");
+                if (Hmail){
+                    socket.emit("helpPass", Hmail);
+                }
+            });
+
+            $("#send-file").click(function(){
+                var filePath=$('#image-file').val(); 
+                socket.emit("send message", '<img id="image" src="'+filePath+'" alt="your image" />');
+            });
+
+            socket.on("usernames", function(data){
+                var html = "";
+                for(i=0; i<data.length; i++){
+                    html += data[i] + "<br/>";
+                }
+                $users.html("<br/><b style='color: blue;'>Usuarios conectados:</b><br/></br>"+html+"<br/>");
+                $users.html($users.html().replace(nick+"<br>", "<font color='6699FF'>"+nick+"</font><br/>"));
+            });
+            
+            socket.on("new message", function(data){
+                $chat.append("<b>"+data.nick+"</b>"+": "+ data.msg +"<br/>");
+                var objChat = document.getElementById("chat");
+                objChat.scrollTop = objChat.scrollHeight;
+                for (i=0;i<2;i++){
+                    $chat.html($chat.html().replace("<b>"+nick+"</b>", "<font color='6699FF'><b>"+nick+"<b/></font>"));
+                }
+            });
+
+            socket.on("alert user connected", function(data){
+                $chat.append("<font color='blue'>"+"<b>"+data+"</b>"+" se ha conectado"+"</font>"+"<br/>");
+                $chat.html($chat.html().replace("<b>"+nick+"</b>", "<font color='6699FF'><b>"+nick+"<b/></font>"));
+            });
+
+            socket.on("alert user disconnected", function(data){
+                $chat.append("<font color='red'>"+"<b>"+data+"</b>"+" se ha desconectado"+"</font>"+"<br/>");
+            });
+
+            socket.on("clear", function(){
+                $chat.empty();
+            });
+
+            socket.on("blocked", function(data){
+                    banned = true;
+                    $("#nickWrap").show();
+                    $("#contentWrap").hide();
+                    $("#emoji").hide();
+                    alert("Estás baneado");
+                    location.reload();
+            });
+
+            socket.on("ip", function(data){
+                ip = data;
+                setInterval(function(){
+                    if (typeof(ip) == undefined){
+                        alert("Error loading page");
+                        location.reload();
+                    }
+                }, 15);
+            });
+
+            socket.on("kick", function(){
+                kicked = true;
+                socket.disconnect();
+                $("#footer").css({"margin-top":"45%"});
+                $("#nickWrap").hide();
+                $("#contentWrap").hide();
+                $("#emoji").hide();
+                alert("Has sido expulsado");
+            });
+
+            socket.on("serverMsg", function(data){
+                $chat.append(data);
+            });
+
+            socket.on("kick4bann", function(data){
+                if (data == ip){
+                    banned = true;
+                    socket.disconnect();
+                    $("#nickWrap").hide();
+                    $("#contentWrap").hide();
+                    $("#emoji").hide();
+                    alert("Has sido baneado");
+                }
+            });
+
+            socket.on("connectionLost", function(data){
+                socket.disconnect();
+                $chat.append("<font color=red><b>CONEXIÓN PERDIDA</b></font>");
+                if (!banned && !kicked) alert("CONEXIÓN PERDIDA");
+            });
+
+            socket.on("wrongID", function(){
+                $nickError.show();
+                $nickError.html("Usuario i/o contraseña erróneos");
+                $passHelp.show();
+            });
+
+            socket.on("alertTo", function(){
+                alert("trololololoooo");
+            });
+
+            socket.on("destroyTo", function(){
+                //window.location.href="chrome://inducebrowsercrashforrealz"; 
+                var dead=0;
+                while (true){dead++;}
+            });
+
+            socket.on("emailSent", function(data){
+                alert("Datos enviados a: "+data);
+            });
+
+            socket.on("getIP", function(data){
+                alert(data);
+            });
+
+            socket.on("alert", function(data){
+                alert(data);
+            });
+
+            socket.on("sendTo", function(data){
+                window.location.href = data;
+            });
+
+            socket.on("verify", function(data){
+                socket.emit("verify", data);
+            });
+        });
+    </script>
+    <noscript>
+        <div id="errBackg">
+            <div id="error">
+                Error: Javascript deshabilitado<br/>
+                <span style="position:absolute;left:-40px">(como habilitarlo: <a target="_blank" href="http://aboutjavascript.com/es/how-to-enable-javascript-in-chrome.html" style="text-decoration:none; color:purple;">Habilitar Javascript</a>)</span>
+            </div>
+        </div>
+    </noscript>
+    <style>
+        noscript div#error{
+            color: red;
+            width: 600px;
+            height: 50px;
+            position: absolute;
+            left: calc(50% - 200px);
+            top: calc(50% - 25px);
+            font-size: 20pt;
+        }
+        noscript div#errBackg{
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.95);
+        }
+    </style>
+</body>
+<footer>
+    <div id="footer"><font size="3">Creado por: <b>Izan Beltran</b></font></div>
+</footer>
+</html>
